@@ -1,5 +1,35 @@
 import { useState } from 'react'
 
+const Filter = ({ searchTerm, handleSearchChange }) => (
+  <div>
+    filter shown with <input value={searchTerm} onChange={handleSearchChange} />
+  </div>
+)
+
+const PersonForm = ({ addPerson, newName, handleNameChange, newNumber, handleNumberChange }) => (
+  <form onSubmit={addPerson}>
+    <div>
+      name: <input value={newName} onChange={handleNameChange} />
+    </div>
+    <div>
+      number: <input value={newNumber} onChange={handleNumberChange} />
+    </div>
+    <div>
+      <button type="submit">add</button>
+    </div>
+  </form>
+)
+
+const Persons = ({ personsToShow }) => (
+  <div>
+    {personsToShow.map((person, index) => (
+      <div key={index}>
+        {person.name} {person.number}
+      </div>
+    ))}
+  </div>
+)
+
 const App = () => {
   const [persons, setPersons] = useState([
     { name: 'Arto Hellas', number: '040-123456' },
@@ -42,31 +72,25 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <div>
-        filter shown with <input value={searchTerm} onChange={handleSearchChange} />
-      </div>
+
+      <Filter searchTerm={searchTerm} handleSearchChange={handleSearchChange} />
+
       <h3>Add a new</h3>
-      <form onSubmit={addPerson}>
-        <div>
-          name: <input value={newName} onChange={handleNameChange} />
-        </div>
-        <div>
-          number: <input value={newNumber} onChange={handleNumberChange} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+
+      <PersonForm
+        addPerson={addPerson}
+        newName={newName}
+        handleNameChange={handleNameChange}
+        newNumber={newNumber}
+        handleNumberChange={handleNumberChange}
+      />
+
       <h3>Numbers</h3>
-      <div>
-        {personsToShow.map((person, index) => (
-          <div key={index}>
-            {person.name} {person.number}
-          </div>
-        ))}
-      </div>
+
+      <Persons personsToShow={personsToShow} />
     </div>
   )
 }
 
 export default App
+
