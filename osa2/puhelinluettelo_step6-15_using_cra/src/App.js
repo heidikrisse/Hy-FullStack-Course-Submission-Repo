@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import personService from './services/persons';
+import personService from './services/persons'
+import './App.css'
 
 const Filter = ({ searchTerm, handleSearchChange }) => (
   <div>
@@ -21,11 +22,12 @@ const PersonForm = ({ addPerson, newName, handleNameChange, newNumber, handleNum
   </form>
 )
 
-const Persons = ({ personsToShow }) => (
+const Persons = ({ personsToShow, handleDelete }) => (
   <div>
     {personsToShow.map((person) => (
       <div key={person.id}>
         {person.name} {person.number}
+        <button className="delete-button" onClick={() => handleDelete(person.id, person.name)}>delete</button>
       </div>
     ))}
   </div>
@@ -57,6 +59,14 @@ const App = () => {
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value)
   }
+
+  const handleDelete = (id, name) => {
+  if (window.confirm(`Delete ${name} ?`)) {
+    personService.remove(id).then(() => {
+      setPersons(persons.filter(person => person.id !== id))
+    })
+  }
+}
 
   const addPerson = (event) => {
     event.preventDefault()
@@ -97,7 +107,7 @@ const App = () => {
 
       <h3>Numbers</h3>
 
-      <Persons personsToShow={personsToShow} />
+      <Persons personsToShow={personsToShow} handleDelete={handleDelete} />
     </div>
   )
 }
