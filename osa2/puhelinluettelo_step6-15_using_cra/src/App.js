@@ -61,27 +61,34 @@ const App = () => {
   }
 
   const handleDelete = (id, name) => {
-  if (window.confirm(`Delete ${name} ?`)) {
-    personService.remove(id).then(() => {
-      setPersons(persons.filter(person => person.id !== id))
-    })
+    if (window.confirm(`Delete ${name} ?`)) {
+      personService.remove(id).then(() => {
+        setPersons(persons.filter(person => person.id !== id))
+      })
+    }
   }
-}
 
   const addPerson = (event) => {
     event.preventDefault()
+    const personExists = persons.find(person => person.name === newName)
     const newPerson = { name: newName, number: newNumber }
 
-    if (persons.some((person) => person.name === newName)) {
-      alert(`${newName} is already added to phonebook`)
+    if (personExists) {
+      if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+        personService
+          .update(personExists.id, newPerson)
+          .then(updatedPerson => {
+            setPersons(persons.map(person => person.id !== personExists.id ? person : updatedPerson))
+            setNewName('')
+            setNewNumber('')
+          })
+      }
     } else {
-      personService
-        .create(newPerson)
-        .then(returnedPerson => {
-          setPersons(persons.concat(returnedPerson))
-          setNewName('')
-          setNewNumber('')
-        })
+      personService.create(newPerson).then(addedPerson => {
+        setPersons(persons.concat(addedPerson))
+        setNewName('')
+        setNewNumber('')
+      })
     }
   }
 
