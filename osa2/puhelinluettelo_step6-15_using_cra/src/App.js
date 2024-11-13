@@ -39,6 +39,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
+  const [notification, setNotification] = useState({ message: null, isSuccess: true })
 
   useEffect(() => {
     personService
@@ -46,7 +47,13 @@ const App = () => {
       .then(initialPersons => {
         setPersons(initialPersons)
       })
-
+      .catch(error => {
+        setNotification({
+          message: "Failed to fetch data from server",
+          isSuccess: false
+        })
+        setTimeout(() => setNotification({ message: null }), 3000)
+      })
   }, [])
 
   const handleNameChange = (event) => {
@@ -63,13 +70,23 @@ const App = () => {
 
   const handleDelete = (id, name) => {
     if (window.confirm(`Delete ${name} ?`)) {
-      personService.remove(id).then(() => {
-        setPersons(persons.filter(person => person.id !== id))
-      })
+      personService
+        .remove(id)
+        .then(() => {
+          setPersons(persons.filter(person => person.id !== id))
+          setNotification({ message: `Deleted ${name}`, isSuccess: true })
+          setTimeout(() => setNotification({ message: null }), 3000)
+        })
+        .catch(error => {
+          setNotification({
+            message: `Information of ${name} has already been removed from server`,
+            isSuccess: false
+          })
+          setTimeout(() => setNotification({ message: null }), 3000)
+        })
     }
   }
 
-  const [successMessage, setSuccessMessage] = useState(null)
   const addPerson = (event) => {
     event.preventDefault()
     const personExists = persons.find(person => person.name === newName)
@@ -81,20 +98,32 @@ const App = () => {
           .update(personExists.id, newPerson)
           .then(updatedPerson => {
             setPersons(persons.map(person => person.id !== personExists.id ? person : updatedPerson))
-            setSuccessMessage(`Updated ${updatedPerson.name}'s number`)
-            setTimeout(() => setSuccessMessage(null), 3000)
+            setNotification({ message: `Updated ${updatedPerson.name}'s number`, isSuccess: true })
+            setTimeout(() => setNotification({ message: null }), 3000)
           })
           .catch(error => {
-            setSuccessMessage(`Failed to update ${newName}'s number`)
-            setTimeout(() => setSuccessMessage(null), 3000)
+            setNotification({
+              message: `Information of ${newName} has already been removed from server`,
+              isSuccess: false
+            })
+            setPersons(persons.filter(person => person.id !== personExists.id))
+            setTimeout(() => setNotification({ message: null }), 3000)
           })
       }
     } else {
-      personService.create(newPerson).then(addedPerson => {
-        setPersons(persons.concat(addedPerson))
-        setSuccessMessage(`Added ${addedPerson.name}`)
-        setTimeout(() => setSuccessMessage(null), 3000)
-      })
+      personService.create(newPerson)
+        .then(addedPerson => {
+          setPersons(persons.concat(addedPerson))
+          setNotification({ message: `Added ${addedPerson.name}`, isSuccess: true })
+          setTimeout(() => setNotification({ message: null }), 3000)
+        })
+        .catch(error => {
+          setNotification({
+            message: `Failed to add ${newName}`,
+            isSuccess: false
+          })
+          setTimeout(() => setNotification({ message: null }), 3000)
+        })
     }
   }    
 
@@ -105,7 +134,7 @@ const App = () => {
   return (
     <div className="App">
       <h2>Phonebook</h2>
-      <Notification message={successMessage} isSuccess={true} />
+      <Notification message={notification.message} isSuccess={notification.isSuccess} />
 
       <Filter searchTerm={searchTerm} handleSearchChange={handleSearchChange} />
 
