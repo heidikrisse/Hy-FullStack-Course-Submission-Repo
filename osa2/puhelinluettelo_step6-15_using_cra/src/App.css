@@ -1,5 +1,5 @@
 .App {
-  text-align: center;
+  margin: 10px;
 }
 
 .App-logo {
@@ -51,4 +51,17 @@
 .delete-button:hover {
   background-color: blue; /* Sininen tausta kun hiiri on päällä */
   color: black;
+}
+
+.notification {
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: bold;
+}
+.notification.success {
+  color: #006400;
+  background: #d3d3d3;
+  border: 3px solid #006400;
 }

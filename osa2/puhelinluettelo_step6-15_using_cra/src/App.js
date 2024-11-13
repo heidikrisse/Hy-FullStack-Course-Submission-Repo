@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import personService from './services/persons'
 import './App.css'
+import Notification from './Notification'
 
 const Filter = ({ searchTerm, handleSearchChange }) => (
   <div>
@@ -68,37 +69,43 @@ const App = () => {
     }
   }
 
+  const [successMessage, setSuccessMessage] = useState(null)
   const addPerson = (event) => {
     event.preventDefault()
     const personExists = persons.find(person => person.name === newName)
     const newPerson = { name: newName, number: newNumber }
-
+  
     if (personExists) {
       if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
         personService
           .update(personExists.id, newPerson)
           .then(updatedPerson => {
             setPersons(persons.map(person => person.id !== personExists.id ? person : updatedPerson))
-            setNewName('')
-            setNewNumber('')
+            setSuccessMessage(`Updated ${updatedPerson.name}'s number`)
+            setTimeout(() => setSuccessMessage(null), 3000)
+          })
+          .catch(error => {
+            setSuccessMessage(`Failed to update ${newName}'s number`)
+            setTimeout(() => setSuccessMessage(null), 3000)
           })
       }
     } else {
       personService.create(newPerson).then(addedPerson => {
         setPersons(persons.concat(addedPerson))
-        setNewName('')
-        setNewNumber('')
+        setSuccessMessage(`Added ${addedPerson.name}`)
+        setTimeout(() => setSuccessMessage(null), 3000)
       })
     }
-  }
+  }    
 
   const personsToShow = persons.filter(person => 
     person.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   return (
-    <div>
+    <div className="App">
       <h2>Phonebook</h2>
+      <Notification message={successMessage} isSuccess={true} />
 
       <Filter searchTerm={searchTerm} handleSearchChange={handleSearchChange} />
 
