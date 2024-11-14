@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 
 const CountryDetail = ({ country }) => {
   return (
@@ -14,7 +14,7 @@ const CountryDetail = ({ country }) => {
       </ul>
       <img src={country.flags.png} alt={`Flag of ${country.name.common}`} width="200px" />
     </div>
-  );
-};
+  )
+}
 
-export default CountryDetail;
+export default CountryDetail
